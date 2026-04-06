@@ -1157,6 +1157,25 @@ declare_clippy_lint! {
 
 declare_clippy_lint! {
     /// ### What it does
+    /// Checks for usage of `split.filter_map(Result::ok)` or `split.flat_map(Result::ok)`
+    /// when `split` has type `std::io::Split`.
+    ///
+    /// ### Why is this bad?
+    /// `std::io::Split` instances might produce a never-ending stream of `Err`,
+    /// in which case `filter_map(Result::ok)` will enter an infinite loop while
+    /// waiting for an `Ok` variant.
+    ///
+    /// See the `lines_filter_map_ok` lint for more information, the same
+    /// considerations applies to `std::io::Split`.
+    /// ```
+    #[clippy::version = "1.96.0"]
+    pub IO_SPLIT_FILTER_MAP_OK,
+    suspicious,
+    "filtering `std::io::Split` with `filter_map()`, `flat_map()`, or `flatten()` might cause an infinite loop"
+}
+
+declare_clippy_lint! {
+    /// ### What it does
     /// Checks for IP addresses that could be replaced with predefined constants such as
     /// `Ipv4Addr::new(127, 0, 0, 1)` instead of using the appropriate constants.
     ///

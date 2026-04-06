@@ -9,8 +9,8 @@ note: this expression returning a `std::io::Split` may produce an infinite numbe
    |
 LL |     BufReader::new(f).split(b'\n').filter_map(Result::ok).for_each(|_| ());
    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   = note: `-D clippy::lines-filter-map-ok` implied by `-D warnings`
-   = help: to override `-D warnings` add `#[allow(clippy::lines_filter_map_ok)]`
+   = note: `-D clippy::io-split-filter-map-ok` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::io_split_filter_map_ok)]`
 
 error: `flat_map()` will run forever if the iterator repeatedly produces an `Err`
   --> tests/ui/split_filter_map_ok.rs:13:36

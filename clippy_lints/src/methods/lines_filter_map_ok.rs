@@ -1,3 +1,4 @@
+use crate::Lint;
 use clippy_utils::diagnostics::span_lint_and_then;
 use clippy_utils::msrvs::{self, Msrv};
 use clippy_utils::res::{MaybeDef, MaybeResPath, MaybeTypeckRes};
@@ -8,13 +9,27 @@ use rustc_lint::LateContext;
 use rustc_middle::ty::Ty;
 use rustc_span::Span;
 
-use super::LINES_FILTER_MAP_OK;
+struct Variant {
+    type_name: &'static str,
+    lint: &'static Lint,
+}
 
-fn is_type(cx: &LateContext<'_>, ty: Ty<'_>) -> Option<&'static str> {
+use super::{IO_SPLIT_FILTER_MAP_OK, LINES_FILTER_MAP_OK};
+
+const LINES: Variant = Variant {
+    lint: &LINES_FILTER_MAP_OK,
+    type_name: "std::io::Lines",
+};
+const SPLIT: Variant = Variant {
+    lint: &IO_SPLIT_FILTER_MAP_OK,
+    type_name: "std::io::Split",
+};
+
+fn is_handled(cx: &LateContext<'_>, ty: Ty<'_>) -> Option<&'static Variant> {
     if ty.is_diag_item(cx, sym::IoLines) {
-        Some("std::io::Lines")
+        Some(&LINES)
     } else if ty.is_diag_item(cx, sym::IoSplit) {
-        Some("std::io::Split")
+        Some(&SPLIT)
     } else {
         None
     }
@@ -22,10 +37,10 @@ fn is_type(cx: &LateContext<'_>, ty: Ty<'_>) -> Option<&'static str> {
 
 pub(super) fn check_flatten(cx: &LateContext<'_>, expr: &Expr<'_>, recv: &Expr<'_>, call_span: Span, msrv: Msrv) {
     if cx.ty_based_def(expr).opt_parent(cx).is_diag_item(cx, sym::Iterator)
-        && let Some(type_name) = is_type(cx, cx.typeck_results().expr_ty_adjusted(recv))
+        && let Some(variant) = is_handled(cx, cx.typeck_results().expr_ty_adjusted(recv))
         && msrv.meets(cx, msrvs::MAP_WHILE)
     {
-        emit(cx, recv, "flatten", call_span, type_name);
+        emit(cx, recv, "flatten", call_span, variant);
     }
 }
 
@@ -39,7 +54,7 @@ pub(super) fn check_filter_or_flat_map(
     msrv: Msrv,
 ) {
     if cx.ty_based_def(expr).opt_parent(cx).is_diag_item(cx, sym::Iterator)
-        && let Some(type_name) = is_type(cx, cx.typeck_results().expr_ty_adjusted(recv))
+        && let Some(variant) = is_handled(cx, cx.typeck_results().expr_ty_adjusted(recv))
         && match method_arg.kind {
             // Detect `Result::ok`
             ExprKind::Path(ref qpath) => cx
@@ -63,22 +78,23 @@ pub(super) fn check_filter_or_flat_map(
         }
         && msrv.meets(cx, msrvs::MAP_WHILE)
     {
-        emit(cx, recv, method_name, call_span, type_name);
+        emit(cx, recv, method_name, call_span, variant);
     }
 }
 
-fn emit(cx: &LateContext<'_>, recv: &Expr<'_>, method_name: &'static str, call_span: Span, type_name: &'static str) {
+fn emit(cx: &LateContext<'_>, recv: &Expr<'_>, method_name: &'static str, call_span: Span, variant: &'static Variant) {
     span_lint_and_then(
         cx,
-        LINES_FILTER_MAP_OK,
+        variant.lint,
         call_span,
         format!("`{method_name}()` will run forever if the iterator repeatedly produces an `Err`"),
         |diag| {
             diag.span_note(
                 recv.span,
                 format!(
-                    "this expression returning a `{type_name}` may produce \
-                        an infinite number of `Err` in case of a read error"
+                    "this expression returning a `{0}` may produce \
+                        an infinite number of `Err` in case of a read error",
+                    variant.type_name
                 ),
             );
             diag.span_suggestion(

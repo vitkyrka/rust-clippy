@@ -6709,6 +6709,7 @@ Released 2018-09-13
 [`inverted_saturating_sub`]: https://rust-lang.github.io/rust-clippy/master/index.html#inverted_saturating_sub
 [`invisible_characters`]: https://rust-lang.github.io/rust-clippy/master/index.html#invisible_characters
 [`io_other_error`]: https://rust-lang.github.io/rust-clippy/master/index.html#io_other_error
+[`io_split_filter_map_ok`]: https://rust-lang.github.io/rust-clippy/master/index.html#io_split_filter_map_ok
 [`ip_constant`]: https://rust-lang.github.io/rust-clippy/master/index.html#ip_constant
 [`is_digit_ascii_radix`]: https://rust-lang.github.io/rust-clippy/master/index.html#is_digit_ascii_radix
 [`items_after_statements`]: https://rust-lang.github.io/rust-clippy/master/index.html#items_after_statements
