@@ -32,7 +32,7 @@ impl Variant {
     }
 }
 
-fn is_handled(cx: &LateContext<'_>, ty: Ty<'_>) -> Option<Variant> {
+fn get_variant(cx: &LateContext<'_>, ty: Ty<'_>) -> Option<Variant> {
     match ty.opt_diag_name(cx) {
         Some(sym::IoLines) => Some(Variant::IoLines),
         Some(sym::IoSplit) => Some(Variant::IoSplit),
@@ -42,7 +42,7 @@ fn is_handled(cx: &LateContext<'_>, ty: Ty<'_>) -> Option<Variant> {
 
 pub(super) fn check_flatten(cx: &LateContext<'_>, expr: &Expr<'_>, recv: &Expr<'_>, call_span: Span, msrv: Msrv) {
     if cx.ty_based_def(expr).opt_parent(cx).is_diag_item(cx, sym::Iterator)
-        && let Some(variant) = is_handled(cx, cx.typeck_results().expr_ty_adjusted(recv))
+        && let Some(variant) = get_variant(cx, cx.typeck_results().expr_ty_adjusted(recv))
         && msrv.meets(cx, msrvs::MAP_WHILE)
     {
         emit(cx, recv, "flatten", call_span, variant);
@@ -59,7 +59,7 @@ pub(super) fn check_filter_or_flat_map(
     msrv: Msrv,
 ) {
     if cx.ty_based_def(expr).opt_parent(cx).is_diag_item(cx, sym::Iterator)
-        && let Some(variant) = is_handled(cx, cx.typeck_results().expr_ty_adjusted(recv))
+        && let Some(variant) = get_variant(cx, cx.typeck_results().expr_ty_adjusted(recv))
         && match method_arg.kind {
             // Detect `Result::ok`
             ExprKind::Path(ref qpath) => cx
