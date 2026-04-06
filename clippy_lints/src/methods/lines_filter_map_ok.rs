@@ -11,20 +11,21 @@ use rustc_span::Span;
 
 use super::{LINES_FILTER_MAP_OK, SPLIT_FILTER_MAP_OK};
 
+#[derive(Clone, Copy)]
 enum Variant {
     Lines,
     Split,
 }
 
 impl Variant {
-    fn lint(&self) -> &'static Lint {
+    fn lint(self) -> &'static Lint {
         match self {
             Variant::Lines => LINES_FILTER_MAP_OK,
             Variant::Split => SPLIT_FILTER_MAP_OK,
         }
     }
 
-    fn type_name(&self) -> &'static str {
+    fn type_name(self) -> &'static str {
         match self {
             Variant::Lines => "std::io::Lines",
             Variant::Split => "std::io::Split",
