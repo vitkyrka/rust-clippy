@@ -1,5 +1,5 @@
 #![allow(clippy::map_identity)]
-#![warn(clippy::io_split_filter_map_ok)]
+#![warn(clippy::split_filter_map_ok)]
 
 use std::io::{self, BufRead, BufReader};
 
@@ -8,20 +8,20 @@ fn main() -> io::Result<()> {
 
     let f = std::fs::File::open("/")?;
     BufReader::new(f).split(b'\n').filter_map(Result::ok).for_each(|_| ());
-    //~^ io_split_filter_map_ok
+    //~^ split_filter_map_ok
     let f = std::fs::File::open("/")?;
     BufReader::new(f).split(b'\n').flat_map(Result::ok).for_each(|_| ());
-    //~^ io_split_filter_map_ok
+    //~^ split_filter_map_ok
     let f = std::fs::File::open("/")?;
     BufReader::new(f).split(b'\n').flatten().for_each(|_| ());
-    //~^ io_split_filter_map_ok
+    //~^ split_filter_map_ok
 
     io::stdin().lock().split(b'\n').filter_map(Result::ok).for_each(|_| ());
-    //~^ io_split_filter_map_ok
+    //~^ split_filter_map_ok
     io::stdin().lock().split(b'\n').filter_map(|x| x.ok()).for_each(|_| ());
-    //~^ io_split_filter_map_ok
+    //~^ split_filter_map_ok
     io::stdin().lock().split(b'\n').flatten().for_each(|_| ());
-    //~^ io_split_filter_map_ok
+    //~^ split_filter_map_ok
 
     // Do not lint:
 

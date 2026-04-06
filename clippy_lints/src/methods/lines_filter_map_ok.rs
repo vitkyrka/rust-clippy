@@ -9,33 +9,33 @@ use rustc_lint::LateContext;
 use rustc_middle::ty::Ty;
 use rustc_span::Span;
 
-use super::{IO_SPLIT_FILTER_MAP_OK, LINES_FILTER_MAP_OK};
+use super::{LINES_FILTER_MAP_OK, SPLIT_FILTER_MAP_OK};
 
 enum Variant {
-    IoLines,
-    IoSplit,
+    Lines,
+    Split,
 }
 
 impl Variant {
     fn lint(&self) -> &'static Lint {
         match self {
-            Variant::IoLines => LINES_FILTER_MAP_OK,
-            Variant::IoSplit => IO_SPLIT_FILTER_MAP_OK,
+            Variant::Lines => LINES_FILTER_MAP_OK,
+            Variant::Split => SPLIT_FILTER_MAP_OK,
         }
     }
 
     fn type_name(&self) -> &'static str {
         match self {
-            Variant::IoLines => "std::io::Lines",
-            Variant::IoSplit => "std::io::Split",
+            Variant::Lines => "std::io::Lines",
+            Variant::Split => "std::io::Split",
         }
     }
 }
 
 fn get_variant(cx: &LateContext<'_>, ty: Ty<'_>) -> Option<Variant> {
     match ty.opt_diag_name(cx) {
-        Some(sym::IoLines) => Some(Variant::IoLines),
-        Some(sym::IoSplit) => Some(Variant::IoSplit),
+        Some(sym::IoLines) => Some(Variant::Lines),
+        Some(sym::IoSplit) => Some(Variant::Split),
         _ => None,
     }
 }

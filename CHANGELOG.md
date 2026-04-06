@@ -6709,7 +6709,6 @@ Released 2018-09-13
 [`inverted_saturating_sub`]: https://rust-lang.github.io/rust-clippy/master/index.html#inverted_saturating_sub
 [`invisible_characters`]: https://rust-lang.github.io/rust-clippy/master/index.html#invisible_characters
 [`io_other_error`]: https://rust-lang.github.io/rust-clippy/master/index.html#io_other_error
-[`io_split_filter_map_ok`]: https://rust-lang.github.io/rust-clippy/master/index.html#io_split_filter_map_ok
 [`ip_constant`]: https://rust-lang.github.io/rust-clippy/master/index.html#ip_constant
 [`is_digit_ascii_radix`]: https://rust-lang.github.io/rust-clippy/master/index.html#is_digit_ascii_radix
 [`items_after_statements`]: https://rust-lang.github.io/rust-clippy/master/index.html#items_after_statements
@@ -7125,6 +7124,7 @@ Released 2018-09-13
 [`skip_while_next`]: https://rust-lang.github.io/rust-clippy/master/index.html#skip_while_next
 [`sliced_string_as_bytes`]: https://rust-lang.github.io/rust-clippy/master/index.html#sliced_string_as_bytes
 [`slow_vector_initialization`]: https://rust-lang.github.io/rust-clippy/master/index.html#slow_vector_initialization
+[`split_filter_map_ok`]: https://rust-lang.github.io/rust-clippy/master/index.html#split_filter_map_ok
 [`stable_sort_primitive`]: https://rust-lang.github.io/rust-clippy/master/index.html#stable_sort_primitive
 [`std_instead_of_alloc`]: https://rust-lang.github.io/rust-clippy/master/index.html#std_instead_of_alloc
 [`std_instead_of_core`]: https://rust-lang.github.io/rust-clippy/master/index.html#std_instead_of_core
