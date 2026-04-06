@@ -10,15 +10,10 @@ use rustc_span::Span;
 
 use super::LINES_FILTER_MAP_OK;
 
-use clippy_utils::paths::{PathLookup, PathNS};
-use clippy_utils::type_path;
-
-static STD_IO_SPLIT: PathLookup = type_path!(std::io::Split);
-
 fn is_type(cx: &LateContext<'_>, ty: Ty<'_>) -> Option<&'static str> {
     if ty.is_diag_item(cx, sym::IoLines) {
         Some("std::io::Lines")
-    } else if STD_IO_SPLIT.matches_ty(cx, ty) {
+    } else if ty.is_diag_item(cx, sym::IoSplit) {
         Some("std::io::Split")
     } else {
         None
