@@ -9,26 +9,34 @@ use rustc_lint::LateContext;
 use rustc_middle::ty::Ty;
 use rustc_span::Span;
 
-struct Variant {
-    lint: &'static Lint,
-    type_name: &'static str,
-}
-
 use super::{IO_SPLIT_FILTER_MAP_OK, LINES_FILTER_MAP_OK};
 
+enum Variant {
+    IoLines,
+    IoSplit,
+}
+
+impl Variant {
+    fn lint(&self) -> &'static Lint {
+        match self {
+            Variant::IoLines => LINES_FILTER_MAP_OK,
+            Variant::IoSplit => IO_SPLIT_FILTER_MAP_OK,
+        }
+    }
+
+    fn type_name(&self) -> &'static str {
+        match self {
+            Variant::IoLines => "std::io::Lines",
+            Variant::IoSplit => "std::io::Split",
+        }
+    }
+}
+
 fn is_handled(cx: &LateContext<'_>, ty: Ty<'_>) -> Option<Variant> {
-    if ty.is_diag_item(cx, sym::IoLines) {
-        Some(Variant {
-            lint: &LINES_FILTER_MAP_OK,
-            type_name: "std::io::Lines",
-        })
-    } else if ty.is_diag_item(cx, sym::IoSplit) {
-        Some(Variant {
-            lint: &IO_SPLIT_FILTER_MAP_OK,
-            type_name: "std::io::Split",
-        })
-    } else {
-        None
+    match ty.opt_diag_name(cx) {
+        Some(sym::IoLines) => Some(Variant::IoLines),
+        Some(sym::IoSplit) => Some(Variant::IoSplit),
+        _ => None,
     }
 }
 
@@ -82,7 +90,7 @@ pub(super) fn check_filter_or_flat_map(
 fn emit(cx: &LateContext<'_>, recv: &Expr<'_>, method_name: &'static str, call_span: Span, variant: Variant) {
     span_lint_and_then(
         cx,
-        variant.lint,
+        variant.lint(),
         call_span,
         format!("`{method_name}()` will run forever if the iterator repeatedly produces an `Err`"),
         |diag| {
@@ -91,7 +99,7 @@ fn emit(cx: &LateContext<'_>, recv: &Expr<'_>, method_name: &'static str, call_s
                 format!(
                     "this expression returning a `{0}` may produce \
                         an infinite number of `Err` in case of a read error",
-                    variant.type_name
+                    variant.type_name(),
                 ),
             );
             diag.span_suggestion(
