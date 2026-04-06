@@ -10,26 +10,23 @@ use rustc_middle::ty::Ty;
 use rustc_span::Span;
 
 struct Variant {
-    type_name: &'static str,
     lint: &'static Lint,
+    type_name: &'static str,
 }
 
 use super::{IO_SPLIT_FILTER_MAP_OK, LINES_FILTER_MAP_OK};
 
-const LINES: Variant = Variant {
-    lint: &LINES_FILTER_MAP_OK,
-    type_name: "std::io::Lines",
-};
-const SPLIT: Variant = Variant {
-    lint: &IO_SPLIT_FILTER_MAP_OK,
-    type_name: "std::io::Split",
-};
-
-fn is_handled(cx: &LateContext<'_>, ty: Ty<'_>) -> Option<&'static Variant> {
+fn is_handled(cx: &LateContext<'_>, ty: Ty<'_>) -> Option<Variant> {
     if ty.is_diag_item(cx, sym::IoLines) {
-        Some(&LINES)
+        Some(Variant {
+            lint: &LINES_FILTER_MAP_OK,
+            type_name: "std::io::Lines",
+        })
     } else if ty.is_diag_item(cx, sym::IoSplit) {
-        Some(&SPLIT)
+        Some(Variant {
+            lint: &IO_SPLIT_FILTER_MAP_OK,
+            type_name: "std::io::Split",
+        })
     } else {
         None
     }
@@ -82,7 +79,7 @@ pub(super) fn check_filter_or_flat_map(
     }
 }
 
-fn emit(cx: &LateContext<'_>, recv: &Expr<'_>, method_name: &'static str, call_span: Span, variant: &'static Variant) {
+fn emit(cx: &LateContext<'_>, recv: &Expr<'_>, method_name: &'static str, call_span: Span, variant: Variant) {
     span_lint_and_then(
         cx,
         variant.lint,
