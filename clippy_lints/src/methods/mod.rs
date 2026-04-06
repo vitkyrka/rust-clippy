@@ -1165,8 +1165,8 @@ declare_clippy_lint! {
     /// in which case `filter_map(Result::ok)` will enter an infinite loop while
     /// waiting for an `Ok` variant.
     ///
-    /// See the `lines_filter_map_ok` lint for more information, the same
-    /// considerations applies to `std::io::Split`.
+    /// See the `lines_filter_map_ok` lint for more information; the
+    /// considerations there apply to `std::io::Split`.
     /// ```
     #[clippy::version = "1.96.0"]
     pub IO_SPLIT_FILTER_MAP_OK,
